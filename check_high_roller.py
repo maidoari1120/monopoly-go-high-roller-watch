@@ -200,16 +200,21 @@ def send_discord_message(message):
     if not DISCORD_WEBHOOK_URL:
         raise RuntimeError("找不到 DISCORD_WEBHOOK_URL，請確認 GitHub Secrets 是否有設定。")
 
-    response = requests.post(
-        DISCORD_WEBHOOK_URL,
-        json={"content": message},
-        timeout=20,
-    )
+response = requests.post(
+    DISCORD_WEBHOOK_URL,
+    json={
+        "content": message,
+        "allowed_mentions": {
+            "parse": ["everyone"]
+        }
+    },
+    timeout=20,
+)
     response.raise_for_status()
 
 
 def build_message(new_events):
-    lines = ["🎲 Monopoly GO 活動提醒：High Roller"]
+    lines = ["@everyone", "🎲 Monopoly GO 活動提醒：High Roller"]
 
     for event in new_events:
         lines.append(f"活動時間：{event['time_range']}")
