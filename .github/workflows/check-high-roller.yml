@@ -1,0 +1,50 @@
+name: Check Monopoly GO High Roller
+
+on:
+  schedule:
+    # 每 2 小時執行一次，時間是 UTC。
+    # 台灣時間也會是每 2 小時一次，只是分鐘固定在第 17 分。
+    - cron: "17 */2 * * *"
+
+  # 這個可以讓你手動按 Run workflow 測試
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright requests
+          python -m playwright install chromium
+
+      - name: Run High Roller checker
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          python check_high_roller.py
+
+      - name: Save state file
+        run: |
+          if [ -n "$(git status --porcelain last_seen_high_roller.json)" ]; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git add last_seen_high_roller.json
+            git commit -m "Update High Roller state"
+            git push
+          else
+            echo "No state changes to commit."
+          fi
