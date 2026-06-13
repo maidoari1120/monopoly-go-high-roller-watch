@@ -200,16 +200,17 @@ def send_discord_message(message):
     if not DISCORD_WEBHOOK_URL:
         raise RuntimeError("找不到 DISCORD_WEBHOOK_URL，請確認 GitHub Secrets 是否有設定。")
 
-response = requests.post(
-    DISCORD_WEBHOOK_URL,
-    json={
-        "content": message,
-        "allowed_mentions": {
-            "parse": ["everyone"]
-        }
-    },
-    timeout=20,
-)
+    response = requests.post(
+        DISCORD_WEBHOOK_URL,
+        json={
+            "content": message,
+            "allowed_mentions": {
+                "parse": ["everyone"]
+            }
+        },
+        timeout=20,
+    )
+
     response.raise_for_status()
 
 
