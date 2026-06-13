@@ -15,7 +15,7 @@ jobs:
           python3 - <<'PY'
           import os
           import json
-          import urllib.request
+          import requests
           from datetime import datetime
           from zoneinfo import ZoneInfo
 
@@ -24,26 +24,19 @@ jobs:
           now = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y/%m/%d %H:%M:%S")
 
           message = (
-              "@everyone\n"
               "🧪 Monopoly GO 推播測試\n"
-              "如果手機有跳出通知，代表 Discord 推播設定成功。\n"
+              "這是一則 GitHub Actions 測試訊息。\n"
               f"測試時間：{now}"
           )
 
-          payload = {
-              "content": message,
-              "allowed_mentions": {
-                  "parse": ["everyone"]
-              }
-          }
-
-          request = urllib.request.Request(
+          response = requests.post(
               webhook_url,
-              data=json.dumps(payload).encode("utf-8"),
-              headers={"Content-Type": "application/json"},
-              method="POST"
+              json={"content": message},
+              timeout=20
           )
 
-          with urllib.request.urlopen(request) as response:
-              print("Discord response status:", response.status)
+          print("Discord response status:", response.status_code)
+          print("Discord response text:", response.text)
+
+          response.raise_for_status()
           PY
