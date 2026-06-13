@@ -1,0 +1,49 @@
+name: Send Discord Test Notification
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send test message to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import json
+          import urllib.request
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          webhook_url = os.environ["DISCORD_WEBHOOK_URL"]
+
+          now = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y/%m/%d %H:%M:%S")
+
+          message = (
+              "@everyone\n"
+              "🧪 Monopoly GO 推播測試\n"
+              "如果手機有跳出通知，代表 Discord 推播設定成功。\n"
+              f"測試時間：{now}"
+          )
+
+          payload = {
+              "content": message,
+              "allowed_mentions": {
+                  "parse": ["everyone"]
+              }
+          }
+
+          request = urllib.request.Request(
+              webhook_url,
+              data=json.dumps(payload).encode("utf-8"),
+              headers={"Content-Type": "application/json"},
+              method="POST"
+          )
+
+          with urllib.request.urlopen(request) as response:
+              print("Discord response status:", response.status)
+          PY
