@@ -209,37 +209,13 @@ def send_discord_message(message):
 
 
 def build_message(new_events):
-    if len(new_events) == 1:
-        event = new_events[0]
-        return (
-            "🎲 Monopoly GO 活動提醒：High Roller\n\n"
-            "偵測到新的或異動的 High Roller 活動時間：\n\n"
-            f"活動時間：\n{event['time_range']}\n\n"
-            f"持續時間：\n{event['duration']}\n\n"
-            f"偵測時間：\n{now_taipei_text()}\n\n"
-            f"來源：\n{URL}"
-        )
+    lines = ["🎲 Monopoly GO 活動提醒：High Roller"]
 
-    lines = [
-        "🎲 Monopoly GO 活動提醒：High Roller",
-        "",
-        f"偵測到 {len(new_events)} 筆新的或異動的 High Roller 活動時間：",
-        "",
-    ]
+    for event in new_events:
+        lines.append(f"活動時間：{event['time_range']}")
+        lines.append(f"持續時間：{event['duration']}")
 
-    for number, event in enumerate(new_events, start=1):
-        lines.extend([
-            f"{number}.",
-            f"活動時間：{event['time_range']}",
-            f"持續時間：{event['duration']}",
-            "",
-        ])
-
-    lines.extend([
-        f"偵測時間：{now_taipei_text()}",
-        "",
-        f"來源：{URL}",
-    ])
+    lines.append(f"來源：{URL}")
 
     return "\n".join(lines)
 
