@@ -87,13 +87,17 @@ def fetch_page_data():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
 
-        page = browser.new_page(
+        context = browser.new_context(
+            timezone_id="Asia/Taipei",
+            locale="zh-TW",
             user_agent=(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/120.0.0.0 Safari/537.36"
             )
         )
+
+        page = context.new_page()
 
         page.goto(URL, wait_until="networkidle", timeout=60000)
         page.wait_for_timeout(5000)
@@ -121,6 +125,7 @@ def fetch_page_data():
             """
         )
 
+        context.close()
         browser.close()
         return body_text, rows
 
